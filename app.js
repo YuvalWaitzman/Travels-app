@@ -17,9 +17,9 @@ app.use((req, res, next) => {
   console.log(req.requestTime);
   next();
 });
-
+//
 //mounting 2 new routers on the routes.
-//3. routes
+//3. Routes
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
