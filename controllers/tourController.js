@@ -1,7 +1,3 @@
-const {
-  findByIdAndUpdate,
-  findByIdAndDelete,
-} = require('./../models/tourModel');
 const Tour = require('./../models/tourModel');
 
 exports.getAllTours = async (req, res) => {
@@ -9,13 +5,47 @@ exports.getAllTours = async (req, res) => {
     //PREPARE FILTER FEATURE - ignore page,sort, limit and fields parameters.
 
     //BUILD QUERY
+    //1A) Filteing
     const queryObj = { ...req.query };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((el) => {
       delete queryObj[el];
     });
+
+    //1B) Advanced filtering
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+    let query = Tour.find(JSON.parse(queryStr));
+
+    //2) Sorting
+    if (req.query.sort) {
+      let sortValue = req.query.sort.split(',').join(' ');
+      query = query.sort(sortValue);
+    } else {
+      //default sorting by time of creation
+      query = query.sort('-createdAt');
+    }
+
+    //3) Field limiting
+    if (req.query.fields) {
+      const requiredFields = req.query.fields.split(',').join(' ');
+      query = query.select(requiredFields);
+    } else {
+      query = query.select('-__v'); //excluding unnecessary field
+    }
+
+    //Pagination
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 100;
+    const skip = (page - 1) * limit;
+    query = query.skip(skip).limit(limit);
+    if (req.query.page) {
+      const numTours = await Tour.countDocuments();
+      if (skip >= numTours) {
+        throw new Error('This page is not exist');
+      }
+    }
     //EXECUTE QUERY
-    const query = Tour.find(queryObj);
     const tours = await query;
 
     //SEND RESPONSE
