@@ -5,7 +5,7 @@ exports.getAllTours = async (req, res) => {
     //PREPARE FILTER FEATURE - ignore page,sort, limit and fields parameters.
 
     //BUILD QUERY
-    //1A) Filteing
+    //1A) Filtering
     const queryObj = { ...req.query };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((el) => {
