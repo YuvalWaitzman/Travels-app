@@ -1,7 +1,3 @@
-const {
-  findByIdAndUpdate,
-  findByIdAndDelete,
-} = require('./../models/tourModel');
 const Tour = require('./../models/tourModel');
 
 exports.getAllTours = async (req, res) => {
