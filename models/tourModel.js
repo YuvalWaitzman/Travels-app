@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const validator = require('validator');
 const tourSchema = new mongoose.Schema(
   {
     name: {
@@ -50,7 +51,16 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'A tour must have a price'],
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      validate: {
+        message: 'Discount price ({VALUE}) should be below the regular price ',
+        validator: function (val) {
+          //only points to the current doc in create tour
+          return val < this.price;
+        },
+      },
+    },
     summary: {
       type: String,
       trim: true,
@@ -86,6 +96,7 @@ tourSchema.virtual('durationWeeks').get(function () {
 });
 
 //DOCUMENT MIDDLEWARE
+//runs only for "save" and "create" and not for "update"
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
