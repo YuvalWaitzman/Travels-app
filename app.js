@@ -12,6 +12,9 @@ app.use(express.json());
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+if (process.env.NODE_ENV === 'production') {
+  console.log('prodcutionnnnn');
+}
 
 app.use(express.static(`${__dirname}/public`));
 
