@@ -60,6 +60,14 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
+  //to ensure that the token was created after the password has been changed
+  next();
+});
+
 //an instance method that will be available on all documents from this collections
 
 userSchema.methods.correctPassword = async function (
