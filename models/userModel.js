@@ -68,7 +68,7 @@ userSchema.pre('save', function (next) {
   next();
 });
 
-//an instance method that will be available on all documents from this collections
+//Instance methods that will be available on all documents from this collections
 
 userSchema.methods.correctPassword = async function (
   candidatePassword,
